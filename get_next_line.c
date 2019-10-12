@@ -6,53 +6,77 @@
 /*   By: jstaunto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 20:42:19 by jstaunto          #+#    #+#             */
-/*   Updated: 2019/10/06 01:27:24 by jstaunto         ###   ########.fr       */
+/*   Updated: 2019/10/12 23:57:42 by jstaunto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char			*check_rem(char *rem, char **line)
+char			*ft_strjoin_fr(char const *s1, char const *s2)
 {
-	char		*p_nl;
+	char		*res;
 
-	p_nl = NULL;
-	if (rem)
-		if ((p_nl = ft_strchr(rem, '\n')))
-		{
-			*p_nl = '\0';
-			*line = ft_strdup(rem);
-			ft_strcpy(rem, ++p_nl);
-		}
-		else
-		{
-			*line = ft_strdup(rem);
-			ft_strclr(rem);
-		}
-	else
-		*line = ft_strnew(1);
-	return (p_nl);
+	res = ft_strjoin(s1, s2);
+	free((char *)s1);
+	return (res);
 }
 
-int			get_next_line(const int fd, char **line)
+void			ft_swap_mem(char *str, char **rem)
 {
 	char		*tmp;
+
+	if (*str)
+	{
+		tmp = *rem;
+		*rem = ft_strdup(str);
+		free(tmp);
+	}
+}
+
+int				ft_rem(char **line, char **rem, char **p_nl)
+{
+	if (*rem && **rem)
+	{
+		if ((*p_nl = ft_strchr(*rem, '\n')))
+		{
+			**p_nl = '\0';
+			*line = ft_strjoin_fr(*line, *rem);
+			ft_swap_mem(++(*p_nl), rem);
+			if (ft_strequ(*rem, *line))
+				ft_strclr(*rem);
+			return (1);
+		}
+		else
+			*line = ft_strjoin_fr(*line, *rem);
+		if (!ft_strchr(*rem, '\n'))
+			ft_strclr(*rem);
+	}
+	return (0);
+}
+
+int				get_next_line(const int fd, char **line)
+{
 	char		buf[BUFF_SIZE + 1];
 	char		*p_nl;
-	static char	*rem;
-	int		rd;
+	static char	*rem[OPEN_MAX];
+	int			rd;
 
-	p_nl = check_rem(rem, line);
-	while (!p_nl && (rd = read(fd, buf, BUFF_SIZE)))
-	{	
+	if (fd < 0 || !line || fd > OPEN_MAX)
+		return (-1);
+	*line = ft_strnew(0);
+	if (ft_rem(line, &rem[fd], &p_nl))
+		return (1);
+	while ((rd = read(fd, buf, BUFF_SIZE)) > 0)
+	{
 		buf[rd] = '\0';
 		if ((p_nl = ft_strchr(buf, '\n')))
 		{
 			*p_nl = '\0';
-			rem = ft_strdup(++p_nl);
+			ft_swap_mem(++p_nl, &rem[fd]);
+			*line = ft_strjoin_fr(*line, buf);
+			return (1);
 		}
-		tmp = *line;
-		*line = ft_strjoin(*line, buf);
-		free(tmp);
+		*line = ft_strjoin_fr(*line, buf);
 	}
-	return (rd || ft_strlen(rem) || ft_strlen(*line) ? 1 : 0); }
+	return ((**line && !rd) ? 1 : rd);
+}
