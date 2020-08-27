@@ -24,4 +24,4 @@ git clone https://github.com/IT-Krivoshey/Get-Next-Line.git
 - Return `0` it finished reading a file
 - Return `-1` if error
 ## License
-This project is licensed under the LGPLv3 License - see the LICENSE file for details.
+This project is licensed under the LGPLv3 License - see the [LICENSE](https://github.com/IT-Krivoshey/Get-Next-Line/blob/master/LICENSE) file for details.
