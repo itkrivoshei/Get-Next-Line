@@ -1,5 +1,5 @@
 # Get_Next_Line
-Get next line is a function that reads a file line by line
+Get next line is a function that reads a file line by line created for [42](https://42.fr/en/homepage/)
 ## Installation
 ```
 git clone https://github.com/IT-Krivoshey/Get-Next-Line.git
